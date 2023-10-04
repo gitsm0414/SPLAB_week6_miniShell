@@ -21,15 +21,18 @@ int main(){
 
 	size_t size;
 	ssize_t cmdread; //related to cmd reading error
-	pid_t pid;
-
-	int i;
+	
 	int cmp; //related to 'quit'
 
 	atexit(cleanup);
 
 	size = 100;
-	arg = (char**)malloc(sizeof(char*) * ARGSIZE);
+	
+	//memmory allocating
+	args = (char**)malloc(sizeof(char*) * ARGSIZE);
+	for(int i=0; i<ARGSIZE; i++){
+		args[i] = (char*)malloc(sizeof(char) * ARGSIZE);
+	}
 
 	do{
 		//getline error handling
@@ -41,11 +44,10 @@ int main(){
 		if((cmp = strcmp("quit",cmd))==0){
 			//if parent has no child, then wait() returns -1 right away
 			//parent waits all possible child processes then quit
-			while(true){
-				if((pid = wait(NULL)) == -1) break;
-			}		
-			exit(0);
-		}	
+			while(wait(NULL) != -1){}
+			break;
+		}
+
 		//cmd parsing -> args
 		i = 0;
 		ptr = strtok(cmd, " ");
@@ -53,7 +55,7 @@ int main(){
 			args[i++] = ptr;
 			ptr = strtok(NULL, " ");
 			}
-		args[i] == NULL;
+		args[i] = NULL;
 
 		//path
 		sprintf(path, "/bin/%s", args[0]);
@@ -64,20 +66,15 @@ int main(){
 			if((exe = execv(path, args)) == -1){
 				perror("command executing error");
 				exit(1);
-			}else{
-				exit(0);
-			}	
+			}
+			exit(0);	
 		}
 		else //if parent, wait until child process ends
 		{ 
 			wait(NULL);
 		}	
 			 
-				
-
 	}while(true);
 	
-	
-
 	exit(0);
 }
