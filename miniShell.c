@@ -11,10 +11,7 @@ char* cmd=NULL;  //pointer for command string, global
 char** args;  //pointer array for each arguments in command, global
 
 void cleanup(void){ //free global malloc variables
-	
 	if(cmd!=NULL) free(cmd);
-	for(int i=0; i<ARGSIZE; i++)
-		if(args[i]!=NULL)  free(args[i]);
 	if(args!=NULL) free(args);
 }
 
@@ -35,9 +32,6 @@ int main(){
 	
 	//memmory allocating
 	args = (char**)malloc(sizeof(char*) * ARGSIZE);
-	for(int i=0; i<ARGSIZE; i++){
-		args[i] = (char*)malloc(sizeof(char) * ARGSIZE);
-	}
 
 	do{
 		//getline error handling
@@ -80,8 +74,9 @@ int main(){
 		else //if parent, wait until child process ends
 		{ 
 			wait(&status);
-			//if(status==1)
-		}	
+		}
+		
+		free(cmd);
 			 
 	}while(1);
 	
