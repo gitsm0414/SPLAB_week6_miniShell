@@ -31,11 +31,11 @@ int main(){
 	arg = (char**)malloc(sizeof(char*) * ARGSIZE);
 
 	do{	//getline error handling
-		if((cmdread = getline(&cmd, &size, stdin)) == -1) exit(1);
+		if((cmdread = getline(&cmd, &size, stdin)) == -1) exit(1);////
 		cmd[strlen(cmd)-1] = '\0';
 
 		//quit
-		if((cmpresult = strcmp("quit",cmd))==0) exit(1);
+		if((cmpresult = strcmp("quit",cmd))==0) exit(1);////
 		
 		//cmd parsing -> args
 		i = 0;
@@ -44,9 +44,21 @@ int main(){
 			args[i++] = ptr;
 			ptr = strtok(NULL, " ");
 			}
+		args[i] == NULL;
+
 		//path
 		sprintf(path, "/bin/%s", args[0]);
 		
+
+		if(fork() == 0){
+			int exe;
+			if((exe = execv(path, args)) == -1){
+				exit(1);
+			}
+			
+		}
+		wait(NULL); ////
+				
 
 	}while(1);
 	
