@@ -5,6 +5,9 @@
 
 #define ARGSIZE 100
 
+char* cmd=NULL;  //pointer for command string, global
+char** args;  //pointer array for each arguments in command, global
+
 void cleanup(void){
 	free(cmd);
 	for(int i=0; i<ARGSIZE; i++)
@@ -13,9 +16,7 @@ void cleanup(void){
 }
 
 int main(){
-	char* cmd=NULL;
-	char* ptr;
-	char** args;
+	char* ptr;	
 	char path[100];
 
 	size_t size;
@@ -24,15 +25,17 @@ int main(){
 	int i;
 	int cmpresult;//related to 'quit'
 	
+	atexit(cleanup);
+
 	size = 100;
 	arg = (char**)malloc(sizeof(char*) * ARGSIZE);
 
 	do{	//getline error handling
-		if((cmdread = getline(&cmd, &size, stdin)) == -1) break;
+		if((cmdread = getline(&cmd, &size, stdin)) == -1) exit(1);
 		cmd[strlen(cmd)-1] = '\0';
 
 		//quit
-		if((cmpresult = strcmp("quit",cmd))==0) break;
+		if((cmpresult = strcmp("quit",cmd))==0) exit(1);
 		
 		//cmd parsing -> args
 		i = 0;
@@ -47,8 +50,7 @@ int main(){
 
 	}while(1);
 	
-	//later -> atexit() !!!
-	free(args);
-	free(cmd);
-	return 0;
+	
+
+	exit(0);
 }
