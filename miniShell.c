@@ -2,6 +2,8 @@
 #include<stdlib.h>
 #include<string.h>
 #include<unistd.h>
+#include<sys/wait.h>
+#include<sys/types.h>
 
 #define ARGSIZE 100
 
@@ -9,10 +11,11 @@ char* cmd=NULL;  //pointer for command string, global
 char** args;  //pointer array for each arguments in command, global
 
 void cleanup(void){ //free global malloc variables
-	free(cmd);
+	
+	if(cmd!=NULL) free(cmd);
 	for(int i=0; i<ARGSIZE; i++)
-		free(args[i]);
-	free(args);
+		if(args[i]!=NULL)  free(args[i]);
+	if(args!=NULL) free(args);
 }
 
 int main(){
@@ -21,8 +24,10 @@ int main(){
 
 	size_t size;
 	ssize_t cmdread; //related to cmd reading error
-	
+	pid_t pid;
+
 	int cmp; //related to 'quit'
+	int status;
 
 	atexit(cleanup);
 
@@ -44,12 +49,15 @@ int main(){
 		if((cmp = strcmp("quit",cmd))==0){
 			//if parent has no child, then wait() returns -1 right away
 			//parent waits all possible child processes then quit
-			while(wait(NULL) != -1){}
+			while(1){
+				pid = wait(NULL);
+				if(pid == -1) break;
+			}
 			break;
 		}
 
 		//cmd parsing -> args
-		i = 0;
+		int i = 0;
 		ptr = strtok(cmd, " ");
 		while(ptr != NULL){
 			args[i++] = ptr;
@@ -71,10 +79,11 @@ int main(){
 		}
 		else //if parent, wait until child process ends
 		{ 
-			wait(NULL);
+			wait(&status);
+			//if(status==1)
 		}	
 			 
-	}while(true);
+	}while(1);
 	
 	exit(0);
 }
